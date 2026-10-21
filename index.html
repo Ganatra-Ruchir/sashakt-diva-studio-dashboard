@@ -1032,23 +1032,32 @@ body{background:#EDF4FB}
 </style>
 <body>
 <script id="studio-value-labels-plugin">
-/* Draw concise direct values for small category charts, without requiring hover. */
 (function(){
-if(typeof Chart==='undefined')return;
-Chart.register({id:'studioDirectValues',afterDatasetsDraw(chart){
- const types=['bar','line'];if(!types.includes(chart.config.type))return;
- const labels=chart.data.labels||[];if(labels.length>12)return;
- const ctx=chart.ctx;ctx.save();ctx.font='600 10px system-ui, sans-serif';ctx.textAlign='center';ctx.fillStyle='#26486d';
- chart.data.datasets.forEach((ds,di)=>{
- const meta=chart.getDatasetMeta(di);if(meta.hidden)return;
- meta.data.forEach((el,i)=>{const val=ds.data[i];if(typeof val!=='number'||!Number.isFinite(val)||val===0)return;
- const pos=el.tooltipPosition();if(!pos||!Number.isFinite(pos.x)||!Number.isFinite(pos.y))return;
- let v= Math.abs(val)>=100000?'₹'+(val/100000).toFixed(1)+'L':Math.abs(val)>=1000?(val/1000).toFixed(1)+'k':Math.round(val).toLocaleString('en-IN');
- const area=chart.chartArea;if(pos.x<area.left+15||pos.x>area.right-15)return;
- ctx.fillText(v,pos.x,Math.max(area.top+12,pos.y-7));
- });
- });ctx.restore();
-}});
+ if(typeof Chart==='undefined')return;
+ Chart.register({id:'studioDirectValues',afterDatasetsDraw(chart){
+  if(!['bar','line','scatter'].includes(chart.config.type))return;
+  const area=chart.chartArea,ctx=chart.ctx,datasets=chart.data.datasets||[];
+  const horizontal=chart.options.indexAxis==='y';
+  const fmt=(n,isMoney)=>{const a=Math.abs(n),v=a>=100000?(n/100000).toFixed(1)+'L':a>=1000?(n/1000).toFixed(1)+'k':Math.round(n).toLocaleString('en-IN');return (isMoney?'₹':'')+v;};
+  ctx.save();ctx.font='600 10px system-ui,Arial';ctx.textBaseline='middle';
+  datasets.forEach((ds,di)=>{
+   const meta=chart.getDatasetMeta(di);if(meta.hidden)return;
+   const money=/income|expense|amount|value|earning/i.test(ds.label||'');
+   meta.data.forEach((el,i)=>{
+    let raw=ds.data[i],n=typeof raw==='number'?raw:raw&&typeof raw==='object'?(Number(raw.y) || Number(raw.x)):NaN;
+    if(!Number.isFinite(n))return;
+    const pt=el.tooltipPosition();if(!pt||!Number.isFinite(pt.x)||!Number.isFinite(pt.y))return;
+    const label=fmt(n,money),w=ctx.measureText(label).width;
+    let x=horizontal?pt.x+5:pt.x,y=horizontal?pt.y:pt.y-10;
+    if(horizontal){if(x+w>area.right-3)x=pt.x-w-8;ctx.textAlign='left';}
+    else{ctx.textAlign='center';if(y<area.top+8)y=pt.y+13;}
+    if(x-w/2<area.left-10||x+w/2>area.right+12||y<area.top||y>area.bottom)return;
+    ctx.fillStyle='#ffffff';ctx.fillRect(horizontal?x-2:x-w/2-2,y-7,w+4,14);
+    ctx.fillStyle='#193d69';ctx.fillText(label,x,y);
+   });
+  });
+  ctx.restore();
+ }});
 })();
 </script>
 <div class="shell"><main class="main">
