@@ -954,6 +954,20 @@ body{background:#EDF4FB}
 .cell-note{font-size:8.5px;color:var(--ink-dim);margin-top:3px;font-weight:400}
 </style>
 
+<style id="studio-compact-spacing-2026">
+/* Layout tightening: preserve all chart canvases and content */
+.main{padding-top:10px!important}
+.main>.row,.main>.panel{margin-top:12px!important;margin-bottom:12px!important}
+.panel{padding:12px 14px!important}
+.row-kpi{gap:9px!important;margin-top:9px!important}
+.row-kpi .kpi-card{min-height:94px!important;padding:11px 12px!important}
+.row-kpi .kpi-label{min-height:0!important;margin-bottom:4px!important}
+.row-kpi .kpi-value{min-height:0!important;margin-bottom:4px!important}
+.row-kpi .kpi-meta{margin-top:0!important}
+.summary-line{padding-top:8px!important;padding-bottom:8px!important}
+.chart-guide,.chart-insight{margin-top:5px!important;margin-bottom:5px!important}
+@media(max-width:620px){.main{padding:8px!important}.panel{padding:10px!important}.row-kpi{gap:8px!important}.row-kpi .kpi-card{min-height:88px!important}}
+</style>
 </head>
 <style>
 @media(max-width:1200px){.row[style*=".9fr 1.1fr"],.row[style*="1.15fr .85fr"],.row[style*="1fr 1fr"]{grid-template-columns:1fr!important}}
@@ -1215,7 +1229,7 @@ function renderKPIs(){
     ['PIECES COMPLETED',num(b.completed),'Daily Update Tracker · reconciled completed pieces'],
     ['PRODUCTION INCOME',compact(b.production_amount),'Daily Update Tracker production value'],
     ['INCOME / COMPLETED PIECE',compact(b.completed?b.production_amount/b.completed:0),'Average production value per completed piece'],
-    ['AVG INCOME / UNIQUE BENEFICIARY',compact(b.beneficiary_records?b.total/b.beneficiary_records:0),'Average tracked income per unique beneficiary']
+    ['AVG STUDIO INCOME / UNIQUE BENEFICIARY',compact(b.beneficiary_records?b.during/b.beneficiary_records:0),'Cumulative income through Studio ÷ unique beneficiaries; not monthly income; alumni not counted twice']
   ];
   document.getElementById('kpiRow').innerHTML=vals.map(x=>
     `<div class="kpi-card"><div class="kpi-label">${x[0]}</div><div class="kpi-value">${x[1]}</div><div class="kpi-meta">${x[2]}</div></div>`
