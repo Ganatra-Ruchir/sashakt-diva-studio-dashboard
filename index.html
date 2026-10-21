@@ -1014,6 +1014,7 @@ body{background:#EDF4FB}
 @media(max-width:1050px){#section-production{grid-template-columns:1fr!important}.row-kpi{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:700px){.main{padding:7px!important}.panel{padding:10px!important}.row-kpi{grid-template-columns:repeat(2,minmax(0,1fr))!important}#section-production .studio-compact-metrics{grid-template-columns:1fr!important}.chart-box[style]{min-height:175px}}
 </style>
+<style id="studio-merged-production">.studio-value-divider{height:1px;background:var(--panel-border-soft,#dce5f0);margin:10px 0}.studio-compact-metrics{gap:7px!important}#section-production>.panel:first-child{align-self:start}#valueIndicators{margin-top:3px}</style>
 </head>
 <style>
 @media(max-width:1200px){.row[style*=".9fr 1.1fr"],.row[style*="1.15fr .85fr"],.row[style*="1fr 1fr"]{grid-template-columns:1fr!important}}
@@ -1099,7 +1100,7 @@ Chart.register({id:'studioDirectValues',afterDatasetsDraw(chart){
 <div class="row row-kpi" id="kpiRow"></div>
 <div class="row" style="grid-template-columns:1.15fr .85fr;gap:14px;">
  <div class="panel"><div class="panel-head"><span class="panel-title" id="costTitle">MONTHLY STUDIO INCOME VS OPERATING EXPENSE</span><div class="inline-filter"><span class="filter-label">VIEW</span><select id="costGranularity" aria-label="Income and expense chart view"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div><div class="panel-sub" style="margin-bottom:8px;">Two bars per period: income through DIVA Design Studio and operating expense. Only comparable comparable periods are used.</div><div class="chart-guide"><b>X-axis:</b> Month / Quarter &nbsp;•&nbsp; <b>Y-axis:</b> Amount<br>Teal = Studio income &nbsp;•&nbsp; Orange = operating expense. Only periods with both values are compared.</div><div class="chart-box" style="height:250px;"><canvas id="chartCost" role="img" aria-label="Studio income versus operating expense chart"></canvas></div><div class="chart-insight" id="costInsight"></div><div class="sc-wrap studio-cost-table-wrap"><table class="studio-table" id="studioCostTable"><tbody><tr><td>Loading periods…</td></tr></tbody></table></div></div>
- <div class="panel"><div class="panel-head"><span class="panel-title">PRODUCTION VALUE INDICATORS</span></div><div id="valueIndicators"></div></div>
+ 
 </div>
 
 
@@ -1107,7 +1108,7 @@ Chart.register({id:'studioDirectValues',afterDatasetsDraw(chart){
 <div class="row" style="grid-template-columns:1fr;gap:14px;"><div class="panel"><div class="panel-head"><span class="panel-title">DESIGN STUDIO PERFORMANCE OVERVIEW</span></div><div class="panel-sub" style="margin-bottom:12px;">Studio-level overview using unique beneficiaries and verified production activity.</div><div class="sc-wrap"><table class="studio-table" id="scoreTable"></table></div></div></div>
 
 <div class="row" id="section-production" style="grid-template-columns:.9fr 1.1fr;gap:14px;">
- <div class="panel"><div class="panel-head"><span class="panel-title">VERIFIED PRODUCTION ACTIVITY</span></div><div class="panel-sub">Verified production activity from valid dated rows. Repeated 'pieces provided' entries are not summed because work can carry across days/months.</div><div id="funnelCards" style="margin-top:14px;"></div></div>
+ <div class="panel"><div class="panel-head"><span class="panel-title">VERIFIED PRODUCTION ACTIVITY</span></div><div class="panel-sub">Verified production activity from valid dated rows. Repeated 'pieces provided' entries are not summed because work can carry across days/months.</div><div id="funnelCards" style="margin-top:8px;"></div><div class="studio-value-divider"></div><div class="panel-head"><span class="panel-title">PRODUCTION VALUE INDICATORS</span></div><div id="valueIndicators"></div></div>
  <div class="panel"><div class="panel-head"><span class="panel-title">MONTHLY PIECES COMPLETED</span></div><div class="panel-sub" style="margin-bottom:8px;">Completed pieces by month from verified production rows</div><div class="chart-guide"><b>X-axis:</b> Month &nbsp;•&nbsp; <b>Y-axis:</b> Pieces completed<br>The line shows verified completed production volume over time.</div><div class="chart-box" style="height:285px;"><canvas id="chartFlow" role="img" aria-label="Monthly pieces completed chart"></canvas></div><div class="chart-insight" id="flowInsight"></div></div>
 </div>
 
