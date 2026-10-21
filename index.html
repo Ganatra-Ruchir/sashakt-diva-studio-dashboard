@@ -968,11 +968,43 @@ body{background:#EDF4FB}
 .chart-guide,.chart-insight{margin-top:5px!important;margin-bottom:5px!important}
 @media(max-width:620px){.main{padding:8px!important}.panel{padding:10px!important}.row-kpi{gap:8px!important}.row-kpi .kpi-card{min-height:88px!important}}
 </style>
+<style id="studio-flow-chart-enhancements">
+.studio-compact-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+#section-production{grid-template-columns:1fr 1fr!important;align-items:start}
+#section-production .studio-compact-metrics .kpi-card{padding:12px!important;min-height:100px!important}
+.studio-cost-table-wrap{max-height:250px;overflow:auto;margin-top:12px}
+.studio-cost-table-wrap table{width:100%;font-variant-numeric:tabular-nums}
+.studio-cost-table-wrap th,.studio-cost-table-wrap td{padding:7px 10px;text-align:right}
+.studio-cost-table-wrap th:first-child,.studio-cost-table-wrap td:first-child{text-align:left}
+.studio-cost-table-wrap th{position:sticky;top:0;background:var(--panel-soft,#eaf3fb);z-index:1}
+@media(max-width:1050px){#section-production{grid-template-columns:1fr!important}}
+@media(max-width:700px){.studio-compact-metrics{grid-template-columns:1fr!important}.studio-cost-table-wrap{overflow-x:auto}}
+</style>
 </head>
 <style>
 @media(max-width:1200px){.row[style*=".9fr 1.1fr"],.row[style*="1.15fr .85fr"],.row[style*="1fr 1fr"]{grid-template-columns:1fr!important}}
 </style>
 <body>
+<script id="studio-value-labels-plugin">
+/* Draw concise direct values for small category charts, without requiring hover. */
+(function(){
+if(typeof Chart==='undefined')return;
+Chart.register({id:'studioDirectValues',afterDatasetsDraw(chart){
+ const types=['bar','line'];if(!types.includes(chart.config.type))return;
+ const labels=chart.data.labels||[];if(labels.length>12)return;
+ const ctx=chart.ctx;ctx.save();ctx.font='600 10px system-ui, sans-serif';ctx.textAlign='center';ctx.fillStyle='#26486d';
+ chart.data.datasets.forEach((ds,di)=>{
+ const meta=chart.getDatasetMeta(di);if(meta.hidden)return;
+ meta.data.forEach((el,i)=>{const val=ds.data[i];if(typeof val!=='number'||!Number.isFinite(val)||val===0)return;
+ const pos=el.tooltipPosition();if(!pos||!Number.isFinite(pos.x)||!Number.isFinite(pos.y))return;
+ let v= Math.abs(val)>=100000?'₹'+(val/100000).toFixed(1)+'L':Math.abs(val)>=1000?(val/1000).toFixed(1)+'k':Math.round(val).toLocaleString('en-IN');
+ const area=chart.chartArea;if(pos.x<area.left+15||pos.x>area.right-15)return;
+ ctx.fillText(v,pos.x,Math.max(area.top+12,pos.y-7));
+ });
+ });ctx.restore();
+}});
+})();
+</script>
 <div class="shell"><main class="main">
 <aside role="status" style="background:#fff9eb;border:1px solid #e3c57e;color:#594212;border-radius:12px;padding:13px 16px;margin:12px 0;font:500 13px/1.5 system-ui,Arial,sans-serif"><strong>Studio audit in progress · 21 October 2026</strong><div>Unique beneficiary matching uses <strong>name + family code together</strong>; two members of one family are separate people. Current reporting counts: <strong>Narol 126, Naroda 121, Vastral 20</strong>. Raw-sheet candidate IDs still require review: Narol 129 versus 126 reported; Naroda 121; Vastral is 20 regular + 16 alumni, not 52 regular. Differences require status, ID and extension checks. <strong>Alumni, income, and production below are provisional pending full reconciliation.</strong></div></aside>
 <div class="topbar">
@@ -1031,6 +1063,12 @@ body{background:#EDF4FB}
 
 <div class="row row-summary"><div class="panel summary-panel"><div class="panel-head"><div class="panel-title-wrap"><span class="panel-title">EXECUTIVE SUMMARY</span></div></div><div class="summary-text" id="summaryText"></div></div></div>
 <div class="row row-kpi" id="kpiRow"></div>
+<div class="row" style="grid-template-columns:1.15fr .85fr;gap:14px;">
+ <div class="panel"><div class="panel-head"><span class="panel-title" id="costTitle">MONTHLY STUDIO INCOME VS OPERATING EXPENSE</span><div class="inline-filter"><span class="filter-label">VIEW</span><select id="costGranularity" aria-label="Income and expense chart view"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div><div class="panel-sub" style="margin-bottom:8px;">Two bars per period: income through DIVA Design Studio and operating expense. Only comparable comparable periods are used.</div><div class="chart-guide"><b>X-axis:</b> Month / Quarter &nbsp;•&nbsp; <b>Y-axis:</b> Amount<br>Teal = Studio income &nbsp;•&nbsp; Orange = operating expense. Only periods with both values are compared.</div><div class="chart-box" style="height:250px;"><canvas id="chartCost" role="img" aria-label="Studio income versus operating expense chart"></canvas></div><div class="chart-insight" id="costInsight"></div><div class="sc-wrap studio-cost-table-wrap"><table class="studio-table" id="studioCostTable"><tbody><tr><td>Loading periods…</td></tr></tbody></table></div></div>
+ <div class="panel"><div class="panel-head"><span class="panel-title">PRODUCTION VALUE INDICATORS</span></div><div id="valueIndicators"></div></div>
+</div>
+
+
 
 <div class="row" style="grid-template-columns:1fr;gap:14px;"><div class="panel"><div class="panel-head"><span class="panel-title">DESIGN STUDIO PERFORMANCE OVERVIEW</span></div><div class="panel-sub" style="margin-bottom:12px;">Studio-level overview using unique beneficiaries and verified production activity.</div><div class="sc-wrap"><table class="studio-table" id="scoreTable"></table></div></div></div>
 
@@ -1048,11 +1086,6 @@ body{background:#EDF4FB}
 <div class="row" id="section-work" style="grid-template-columns:1fr 1fr;gap:14px;">
  <div class="panel"><div class="panel-head"><span class="panel-title">WORK TYPE PRODUCTION CONTRIBUTION</span></div><div class="panel-sub" style="margin-bottom:8px;">Completed pieces by recorded work type, using the available Studio production breakdown. Vendor identities are not shown.</div><div class="chart-guide"><b>X-axis:</b> Completed pieces &nbsp;•&nbsp; <b>Y-axis:</b> Work type<br>Showing recorded production across all available periods. Verified vendor-level contribution data is not available.</div><div class="chart-box" style="height:270px;"><canvas id="chartSources" role="img" aria-label="Completed pieces by work type chart"></canvas></div><div class="chart-insight" id="sourcesInsight"></div></div>
  <div class="panel"><div class="panel-head"><span class="panel-title">WORK VALUE &amp; VOLUME</span></div><div class="panel-sub" style="margin-bottom:8px;">Each point represents a work type. X-axis = pieces completed · Y-axis = income per completed piece · Bubble size = total production income.</div><div class="chart-guide"><b>X-axis:</b> Pieces completed &nbsp;•&nbsp; <b>Y-axis:</b> Income per completed piece<br>Higher points have greater value per piece; points further right have greater production volume.</div><div class="chart-box" style="height:270px;"><canvas id="chartValueVolume" role="img" aria-label="Work value and volume chart"></canvas></div><div class="chart-insight" id="valueVolumeInsight"></div></div>
-</div>
-
-<div class="row" style="grid-template-columns:1.15fr .85fr;gap:14px;">
- <div class="panel"><div class="panel-head"><span class="panel-title" id="costTitle">MONTHLY STUDIO INCOME VS OPERATING EXPENSE</span><div class="inline-filter"><span class="filter-label">VIEW</span><select id="costGranularity" aria-label="Income and expense chart view"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div><div class="panel-sub" style="margin-bottom:8px;">Two bars per period: income through DIVA Design Studio and operating expense. Only comparable comparable periods are used.</div><div class="chart-guide"><b>X-axis:</b> Month / Quarter &nbsp;•&nbsp; <b>Y-axis:</b> Amount<br>Teal = Studio income &nbsp;•&nbsp; Orange = operating expense. Only periods with both values are compared.</div><div class="chart-box" style="height:250px;"><canvas id="chartCost" role="img" aria-label="Studio income versus operating expense chart"></canvas></div><div class="chart-insight" id="costInsight"></div></div>
- <div class="panel"><div class="panel-head"><span class="panel-title">PRODUCTION VALUE INDICATORS</span></div><div id="valueIndicators"></div></div>
 </div>
 
 <div class="row row-quad" id="section-beneficiary">
@@ -1309,19 +1342,19 @@ function renderFunnel(){
   const perPiece=completed&&income!==null?income/completed:null;
 
   document.getElementById('funnelCards').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr;gap:10px">
+    <div class="studio-compact-metrics">
       <div class="kpi-card">
         <div class="kpi-label">PIECES COMPLETED</div>
         <div class="kpi-value">${completed===null?'N/A':num(completed)}</div>
         <div class="kpi-meta">${filtered?'Selected period':'Total completed pieces so far'}</div>
       </div>
-      <div style="text-align:center;color:var(--ink-dim);font-size:18px">↓</div>
+      
       <div class="kpi-card">
         <div class="kpi-label">PRODUCTION INCOME</div>
         <div class="kpi-value">${income===null?'N/A':compact(income)}</div>
         <div class="kpi-meta">${filtered?'Selected period':'Production income so far'}</div>
       </div>
-      <div style="text-align:center;color:var(--ink-dim);font-size:18px">↓</div>
+      
       <div class="kpi-card">
         <div class="kpi-label">INCOME / COMPLETED PIECE</div>
         <div class="kpi-value">${perPiece===null?'N/A':compact(perPiece)}</div>
@@ -1550,6 +1583,13 @@ function renderCost(){
     vals=Object.values(map).sort((a,b)=>(a.year-b.year)||(a.month-b.month));
   }
 
+  const costTable=document.getElementById('studioCostTable');
+  if(costTable){
+    const fmt=v=>Number(v||0).toLocaleString('en-IN',{maximumFractionDigits:0});
+    costTable.innerHTML='<thead><tr><th>Period</th><th>Studio income (₹)</th><th>Operating expense (₹)</th><th>Difference (₹)</th></tr></thead><tbody>'+
+      vals.map(r=>'<tr><td>'+r.label+'</td><td>'+fmt(r.income)+'</td><td>'+fmt(r.expense)+'</td><td>'+fmt(r.income-r.expense)+'</td></tr>').join('')+
+      '<tr><th>Total shown</th><th>'+fmt(vals.reduce((a,r)=>a+r.income,0))+'</th><th>'+fmt(vals.reduce((a,r)=>a+r.expense,0))+'</th><th>'+fmt(vals.reduce((a,r)=>a+r.income-r.expense,0))+'</th></tr></tbody>';
+  }
   const title=document.getElementById('costTitle');
   if(title)title.textContent=isQuarterly?'QUARTERLY STUDIO INCOME VS OPERATING EXPENSE':'MONTHLY STUDIO INCOME VS OPERATING EXPENSE';
 
