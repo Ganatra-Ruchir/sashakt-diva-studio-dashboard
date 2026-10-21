@@ -1118,6 +1118,8 @@ body{background:#EDF4FB}
 
 <div class="row row-summary"><div class="panel summary-panel"><div class="panel-head"><div class="panel-title-wrap"><span class="panel-title">EXECUTIVE SUMMARY</span></div></div><div class="summary-text" id="summaryText"></div></div></div>
 <div class="row row-kpi" id="kpiRow"></div>
+<div class="row" style="grid-template-columns:1fr;gap:14px;"><div class="panel"><div class="panel-head"><span class="panel-title">DESIGN STUDIO PERFORMANCE OVERVIEW</span></div><div class="panel-sub" style="margin-bottom:12px;">Studio-level overview using unique beneficiaries and verified production activity.</div><div class="sc-wrap"><table class="studio-table" id="scoreTable"></table></div></div></div>
+
 <div class="row studio-finance-production-row" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:10px;align-items:start;">
  <div class="panel"><div class="panel-head"><span class="panel-title" id="costTitle">MONTHLY STUDIO INCOME VS OPERATING EXPENSE</span><div class="inline-filter"><span class="filter-label">VIEW</span><select id="costGranularity" aria-label="Income and expense chart view"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div><div class="panel-sub" style="margin-bottom:8px;">Two bars per period: income through DIVA Design Studio and operating expense. Only comparable comparable periods are used.</div><div class="chart-guide"><b>X-axis:</b> Month / Quarter &nbsp;•&nbsp; <b>Y-axis:</b> Amount<br>Teal = Studio income &nbsp;•&nbsp; Orange = operating expense. Only periods with both values are compared.</div><div class="chart-box" style="height:250px;"><canvas id="chartCost" role="img" aria-label="Studio income versus operating expense chart"></canvas></div><div class="chart-insight" id="costInsight"></div><div class="sc-wrap studio-cost-table-wrap"><table class="studio-table" id="studioCostTable"><tbody><tr><td>Loading periods…</td></tr></tbody></table></div></div>
  
@@ -1126,7 +1128,7 @@ body{background:#EDF4FB}
 
 
 
-<div class="row" style="grid-template-columns:1fr;gap:14px;"><div class="panel"><div class="panel-head"><span class="panel-title">DESIGN STUDIO PERFORMANCE OVERVIEW</span></div><div class="panel-sub" style="margin-bottom:12px;">Studio-level overview using unique beneficiaries and verified production activity.</div><div class="sc-wrap"><table class="studio-table" id="scoreTable"></table></div></div></div>
+
 
 <div class="row" style="grid-template-columns:1fr;gap:9px;">
 <div class="panel"><div class="panel-head"><span class="panel-title">MONTHLY PIECES COMPLETED</span></div><div class="panel-sub" style="margin-bottom:8px;">Completed pieces by month from verified production rows</div><div class="chart-guide"><b>X-axis:</b> Month &nbsp;•&nbsp; <b>Y-axis:</b> Pieces completed<br>The line shows verified completed production volume over time.</div><div class="chart-box" style="height:285px;"><canvas id="chartFlow" role="img" aria-label="Monthly pieces completed chart"></canvas></div><div class="chart-insight" id="flowInsight"></div></div>
