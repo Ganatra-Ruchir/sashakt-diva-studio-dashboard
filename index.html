@@ -1026,7 +1026,14 @@ body{background:#EDF4FB}
 @media(max-width:1050px){.studio-finance-production-row{grid-template-columns:1fr!important}.studio-finance-production-row .studio-compact-metrics{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media(max-width:600px){.studio-finance-production-row .studio-compact-metrics{grid-template-columns:1fr!important}}
 </style>
-<style id="studio-avg-controls">.studio-avg-selector{width:100%;border:1px solid var(--panel-border,#d7e4f5);border-radius:7px;padding:4px 6px;margin:4px 0 7px;background:var(--panel,#fff);color:var(--ink,#16213d);font-size:11px}.row-main{grid-template-columns:repeat(2,minmax(0,1fr))!important}@media(max-width:850px){.row-main{grid-template-columns:1fr!important}}</style></head>
+<style id="studio-avg-controls">.studio-avg-selector{width:100%;border:1px solid var(--panel-border,#d7e4f5);border-radius:7px;padding:4px 6px;margin:4px 0 7px;background:var(--panel,#fff);color:var(--ink,#16213d);font-size:11px}.row-main{grid-template-columns:repeat(2,minmax(0,1fr))!important}@media(max-width:850px){.row-main{grid-template-columns:1fr!important}}</style><style id="studio-finance-tight-stack">
+/* Full-width finance panel followed immediately by production trend; no empty grid column. */
+.studio-finance-production-row{grid-template-columns:minmax(0,1fr)!important;margin-bottom:10px!important;align-items:start!important}
+.studio-finance-production-row>.panel{width:100%;min-width:0}
+#studio-combined-production{display:grid;grid-template-columns:minmax(0,1fr)!important;margin-top:0!important;margin-bottom:12px!important;gap:0!important}
+#studio-combined-production>.panel{min-width:0}
+</style>
+</head>
 <style>
 @media(max-width:1200px){.row[style*=".9fr 1.1fr"],.row[style*="1.15fr .85fr"],.row[style*="1fr 1fr"]{grid-template-columns:1fr!important}}
 </style>
@@ -1120,16 +1127,9 @@ body{background:#EDF4FB}
 <div class="row row-kpi" id="kpiRow"></div>
 <div class="row" style="grid-template-columns:1fr;gap:14px;"><div class="panel"><div class="panel-head"><span class="panel-title">DESIGN STUDIO PERFORMANCE OVERVIEW</span></div><div class="panel-sub" style="margin-bottom:12px;">Studio-level overview using unique beneficiaries and production indicators.</div><div class="sc-wrap"><table class="studio-table" id="scoreTable"></table></div></div></div>
 
-<div class="row studio-finance-production-row" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:10px;align-items:start;">
+<div class="row studio-finance-production-row" style="grid-template-columns:minmax(0,1fr);gap:10px;align-items:start;">
  <div class="panel"><div class="panel-head"><span class="panel-title" id="costTitle">MONTHLY STUDIO INCOME VS OPERATING EXPENSE</span><div class="inline-filter"><span class="filter-label">VIEW</span><select id="costGranularity" aria-label="Income and expense chart view"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div><div class="panel-sub" style="margin-bottom:8px;">Two bars per period: income through DIVA Design Studio and operating expense. Only comparable comparable periods are used.</div><div class="chart-guide"><b>X-axis:</b> Month / Quarter &nbsp;•&nbsp; <b>Y-axis:</b> Amount<br>Teal = Studio income &nbsp;•&nbsp; Orange = operating expense. Only periods with both values are compared.</div><div class="chart-box" style="height:250px;"><canvas id="chartCost" role="img" aria-label="Studio income versus operating expense chart"></canvas></div><div class="chart-insight" id="costInsight"></div><div class="sc-wrap studio-cost-table-wrap"><table class="studio-table" id="studioCostTable"><tbody><tr><td>Loading periods…</td></tr></tbody></table></div></div>
- 
-
 </div>
-
-
-
-
-
 <div class="row" id="studio-combined-production" style="grid-template-columns:1fr;gap:9px"><div class="panel"><div class="panel-head"><span class="panel-title">MONTHLY PIECES COMPLETED &amp; PRODUCTION INCOME</span></div><div class="panel-sub">Pieces completed (left axis) and production income in rupees (right axis) for the same month. Both series respond to the branch and period filters.</div><div class="chart-box" style="height:265px"><canvas id="chartFlow" role="img" aria-label="Monthly pieces completed and production income combined chart"></canvas></div><div class="chart-insight" id="flowInsight"></div></div></div>
 
 <div class="row row-main">
