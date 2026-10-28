@@ -1399,6 +1399,9 @@ function beneficiaryPeriodCounts(){
   }
   return people.size?{unique:people.size,earning:[...people.values()].filter(v=>v.income>0).length}:null;
 }
+
+const VERIFIED_BATCH_COUNTS={"Narol":[29,21,21,16,16,6],"Naroda":[39,17,14,17,24],"Vastral":[20,20]};
+const verifiedBatchCount=()=> (typeof selectedBranches==='function'?selectedBranches():branchList()).reduce((total,branch)=>total+(VERIFIED_BATCH_COUNTS[branch]||[]).reduce((sum,n)=>sum+n,0),0);
 function renderKPIs(){
   const b=scopeSummary();
   const people=beneficiaryPeriodCounts();
@@ -1425,6 +1428,8 @@ function renderKPIs(){
   const piecesPerMonthNote=piecesPerMonth===null?'Monthly average unavailable':`Around ${num(piecesPerMonth)} pieces per recorded month across ${num(reportedMonths)} months`;
   const afterValue=(state.branch==='Vastral'&&!DATA.branchSummary.Vastral.after_available)?'N/A':compact(b.after);
   const vals=[
+    ['BENEFICIARIES BY BATCH (COMPLETED + ONGOING)',num(verifiedBatchCount()),'Batch-wise roster totals · not deduplicated between batches'],
+
 
     ['UNIQUE BENEFICIARIES',num(b.beneficiary_records),`${num(b.alumni||0)} alumni in a separate category${b.ojt_students?` · ${num(b.ojt_students)} OJT trainees`:''}`],
     ['TOTAL BENEFICIARY INCOME',compact(b.total),'Earnings during Studio work and income reported after completion'],
