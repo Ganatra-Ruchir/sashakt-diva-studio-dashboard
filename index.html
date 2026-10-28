@@ -1107,6 +1107,27 @@ body{background:#EDF4FB}
 .row-kpi .studio-avg-selector{margin:3px 0 0!important;min-height:28px!important}
 @media(max-width:580px){.row-kpi{grid-auto-rows:auto!important}.row-kpi .kpi-card{min-height:112px!important}}
 </style>
+
+<style id="studio-salon-header-alignment">
+/* Match Salon dashboard header proportions and single-row desktop alignment. */
+@media (min-width:1401px){
+  .topbar{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:14px!important;padding:18px 22px!important;min-height:142px!important;margin-bottom:16px!important;}
+  .topbar .top-brand{flex:0 0 auto!important;gap:18px!important;min-width:0;}
+  .topbar .top-brand img{width:162px!important;height:104px!important;object-fit:contain!important;}
+  .topbar .top-divider{display:block!important;align-self:stretch!important;width:1px!important;flex:0 0 1px!important;}
+  .topbar .ask-bar{flex:1 1 390px!important;min-width:250px!important;max-width:none!important;width:auto!important;grid-column:auto!important;order:initial!important;margin:0!important;}
+  .topbar .top-status{flex:0 1 475px!important;max-width:475px!important;width:auto!important;grid-column:auto!important;order:initial!important;margin:0!important;font-size:10px!important;font-weight:500!important;}
+  .topbar .top-meta{flex:0 0 auto!important;margin-left:auto!important;align-self:center!important;}
+  .topbar .top-title{font-size:16.5px!important;white-space:nowrap;}
+}
+@media (min-width:981px) and (max-width:1400px){
+  .topbar{display:flex!important;flex-wrap:wrap!important;align-items:center!important;}
+  .topbar .top-brand img{width:162px!important;height:104px!important;}
+  .topbar .ask-bar{flex:1 1 320px!important;grid-column:auto!important;width:auto!important;}
+  .topbar .top-status{flex:1 1 420px!important;grid-column:auto!important;width:auto!important;margin-top:0!important;}
+  .topbar .top-meta{margin-left:auto!important;}
+}
+</style>
 </head>
 <style>
 @media(max-width:1200px){.row[style*=".9fr 1.1fr"],.row[style*="1.15fr .85fr"],.row[style*="1fr 1fr"]{grid-template-columns:1fr!important}}
