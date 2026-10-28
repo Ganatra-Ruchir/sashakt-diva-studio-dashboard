@@ -1448,7 +1448,7 @@ function renderKPIs(){
   const piecesPerMonthNote=piecesPerMonth===null?'Monthly average unavailable':`Around ${num(piecesPerMonth)} pieces per recorded month across ${num(reportedMonths)} months`;
   const afterValue=(state.branch==='Vastral'&&!DATA.branchSummary.Vastral.after_available)?'N/A':compact(b.after);
   const vals=[
-    ['PEOPLE IN STARTED BATCHES',num(verifiedBatchCount()),'Total people in batches. Some may be in more than one batch.'],
+    ['BENEFICIARIES',num(verifiedBatchCount()),''],
 
     ['TOTAL INCOME EARNED',compact(b.total),'Earnings during Studio work and income reported after completion'],
     ['INCOME EARNED IN STUDIO',reportedIncome===null?na:compact(reportedIncome),'Income earned by beneficiaries while working with the Studio'],
