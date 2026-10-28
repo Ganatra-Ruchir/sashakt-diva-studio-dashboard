@@ -1380,6 +1380,13 @@ function renderSummary(){
 }
 function renderKPIs(){
   const b=scopeSummary();
+  const filtered=state.year!=='All'||state.month!=='All';
+  const periodRows=filteredMonthly();
+  const available=periodRows.length>0;
+  const periodCompleted=available?sum(periodRows,'completed'):null;
+  const periodProduction=available?sum(periodRows,'amount'):null;
+  const periodParticipants=available?sum(periodRows,'participations'):null;
+  const na='Not Available';
   const avgIncomeGroup=state.avgIncomeGroup||'regular';
   const avgBranches=selectedBranches();
   const avgRegular=avgBranches.reduce((n,branch)=>n+(DATA.studioIncomeByStatus[branch]?.regular||0),0);
@@ -1389,20 +1396,21 @@ function renderKPIs(){
   const avgIncomeNumerator=avgIncomeGroup==='regular'?avgRegular:avgIncomeGroup==='alumni'?avgAlumni:avgRegular+avgAlumni;
   const avgIncomeDenominator=avgIncomeGroup==='regular'?avgRegularCount:avgIncomeGroup==='alumni'?avgAlumniCount:avgRegularCount+avgAlumniCount;
   const avgIncomeLabel=avgIncomeGroup==='regular'?'Regular beneficiaries':avgIncomeGroup==='alumni'?'Alumni':'Regular and alumni';
-  const reportedMonths=new Set(DATA.monthly.filter(r=>avgBranches.includes(r.branch)).map(r=>r.ym||`${r.year}-${String(r.month).padStart(2,'0')}`)).size;
-  const piecesPerMonth=reportedMonths?Math.round(b.completed/reportedMonths):null;
+  const reportedMonths=new Set((filtered?periodRows:DATA.monthly.filter(r=>avgBranches.includes(r.branch))).map(r=>r.ym||`${r.year}-${String(r.month).padStart(2,'0')}`)).size;
+  const piecesPerMonth=reportedMonths?Math.round((filtered?periodCompleted:b.completed)/reportedMonths):null;
   const piecesPerMonthNote=piecesPerMonth===null?'Monthly average unavailable':`Around ${num(piecesPerMonth)} pieces per recorded month across ${num(reportedMonths)} months`;
   const afterValue=(state.branch==='Vastral'&&!DATA.branchSummary.Vastral.after_available)?'N/A':compact(b.after);
   const vals=[
-    ['UNIQUE BENEFICIARIES',num(b.beneficiary_records),`${num(b.alumni||0)} alumni in a separate category${b.ojt_students?` · ${num(b.ojt_students)} OJT trainees`:''}`],
-    ['TOTAL BENEFICIARY INCOME',compact(b.total),'Earnings during Studio work and income reported after completion'],
-    ['INCOME THROUGH DESIGN STUDIO',compact(b.during),'Income earned by beneficiaries while working with the Studio'],
-    ['INCOME AFTER DESIGN STUDIO',afterValue,state.branch==='Vastral'?'After-Studio income not available':state.branch==='All'?'Narol + Naroda after-Studio income':'Income after Design Studio so far'],
-    ['PIECES COMPLETED',num(b.completed),piecesPerMonthNote],
-    ['PRODUCTION INCOME',compact(b.production_amount),'Total recorded value of completed Studio production work'],
-    ['INCOME / COMPLETED PIECE',compact(b.completed?b.production_amount/b.completed:0),'Formula: total production value ÷ completed pieces'],
-    ['AVG STUDIO INCOME / UNIQUE BENEFICIARY',compact(avgIncomeDenominator?avgIncomeNumerator/avgIncomeDenominator:0),'']
+    ['UNIQUE BENEFICIARIES',filtered?na:num(b.beneficiary_records),`${num(b.alumni||0)} alumni in a separate category${b.ojt_students?` · ${num(b.ojt_students)} OJT trainees`:''}`],
+    ['TOTAL BENEFICIARY INCOME',filtered?na:compact(b.total),'Earnings during Studio work and income reported after completion'],
+    ['INCOME THROUGH DESIGN STUDIO',filtered?na:compact(b.during),'Income earned by beneficiaries while working with the Studio'],
+    ['INCOME AFTER DESIGN STUDIO',filtered?na:afterValue,state.branch==='Vastral'?'After-Studio income not available':state.branch==='All'?'Narol + Naroda after-Studio income':'Income after Design Studio so far'],
+    ['PIECES COMPLETED',available?num(filtered?periodCompleted:b.completed):na,piecesPerMonthNote],
+    ['PRODUCTION INCOME',available?compact(filtered?periodProduction:b.production_amount):na,'Total recorded value of completed Studio production work'],
+    ['INCOME / COMPLETED PIECE',available&&((filtered?periodCompleted:b.completed)>0)?compact((filtered?periodProduction:b.production_amount)/(filtered?periodCompleted:b.completed)):na,'Formula: total production value ÷ completed pieces'],
+    ['AVG STUDIO INCOME / UNIQUE BENEFICIARY',filtered?na:(avgIncomeDenominator?compact(avgIncomeNumerator/avgIncomeDenominator):na),'']
   ];
+  if(filtered)vals.forEach(v=>{if(v[1]===na)v[2]='Not Available for the selected year/month; lifetime totals are not reused.';});
   document.getElementById('kpiRow').innerHTML=vals.map(x=>
     `<div class="kpi-card"><div class="kpi-label">${x[0]}</div><div class="kpi-value">${x[1]}</div><div class="kpi-meta">${x[2]}</div></div>`
   ).join('');
