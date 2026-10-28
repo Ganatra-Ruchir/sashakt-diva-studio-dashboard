@@ -1425,8 +1425,7 @@ function renderKPIs(){
   const piecesPerMonthNote=piecesPerMonth===null?'Monthly average unavailable':`Around ${num(piecesPerMonth)} pieces per recorded month across ${num(reportedMonths)} months`;
   const afterValue=(state.branch==='Vastral'&&!DATA.branchSummary.Vastral.after_available)?'N/A':compact(b.after);
   const vals=[
-    ['UNIQUE BENEFICIARIES WITH VERIFIED INCOME RECORDS',people?num(people.unique):na,'Distinct IDs; recorded ₹0 included. Not enrollment.'],
-    ['EARNING BENEFICIARIES (> ₹0)',people?num(people.earning):na,'Distinct IDs with positive income in selected period.'],
+    ['BENEFICIARIES WITH MONTHLY INCOME RECORDS',people?num(people.unique):na,'Distinct beneficiary IDs including recorded ₹0; not enrollment.'],
     ['UNIQUE BENEFICIARIES',num(b.beneficiary_records),`${num(b.alumni||0)} alumni in a separate category${b.ojt_students?` · ${num(b.ojt_students)} OJT trainees`:''}`],
     ['TOTAL BENEFICIARY INCOME',compact(b.total),'Earnings during Studio work and income reported after completion'],
     ['INCOME THROUGH DESIGN STUDIO',reportedIncome===null?(filtered?na:compact(b.during)):(filtered?compact(reportedIncome):compact(b.during)),'Income earned by beneficiaries while working with the Studio'],
