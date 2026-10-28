@@ -1179,9 +1179,9 @@ body{background:#EDF4FB}
     <span class="ask-tag">Q&amp;A</span>
     <div class="qa-suggestions" id="qaSuggestions"></div>
   </div>
-  <div class="top-status"><span class="status-dot"></span><span>Studio income is provisional pending row-level reconciliation. Vastral reporting was incomplete as of 15 Oct 2026. Production and expense values are historical, not reverified.</span></div>
+  <div class="top-status"><span class="status-dot"></span><span>Vastral September income is still pending. Figures are based on available records.</span></div>
   <div class="top-meta">
-    <div class="updated"><b>INCOME PROVISIONAL · reconciliation pending</b>Dashboard status</div>
+    <div class="updated"><b>Some data still pending</b>Dashboard status</div>
     <div class="hbtn" id="resetFiltersBtn" title="Reset filters" role="button" tabindex="0" aria-label="Reset filters">↺</div>
   </div>
 </div>
@@ -1218,13 +1218,13 @@ body{background:#EDF4FB}
   <div class="filter-reset-link" id="filterReset" role="button" tabindex="0">Reset</div>
 </div>
 
-<div class="row row-summary"><div class="panel summary-panel"><div class="panel-head"><div class="panel-title-wrap"><span class="panel-title">EXECUTIVE SUMMARY</span></div></div><div class="summary-text" id="summaryText"></div></div></div>
+<div class="row row-summary"><div class="panel summary-panel"><div class="panel-head"><div class="panel-title-wrap"><span class="panel-title">QUICK SUMMARY</span></div></div><div class="summary-text" id="summaryText"></div></div></div>
 <div class="row row-kpi" id="kpiRow"></div>
 <div class="row" style="grid-template-columns:1fr;gap:14px;"><div class="panel"><div class="panel-head"><span class="panel-title">DESIGN STUDIO PERFORMANCE OVERVIEW</span></div><div class="panel-sub" style="margin-bottom:12px;">Studio-level overview using unique beneficiaries and production indicators.</div><div class="sc-wrap"><table class="studio-table" id="scoreTable"></table></div></div></div>
 
 <div class="row studio-finance-production-row studio-dual-charts">
  <div class="panel"><div class="panel-head"><span class="panel-title" id="costTitle">MONTHLY STUDIO INCOME VS OPERATING EXPENSE</span><div class="inline-filter"><span class="filter-label">VIEW</span><select id="costGranularity" aria-label="Income and expense chart view"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div><div class="panel-sub" style="margin-bottom:8px;">Two bars per period: income through DIVA Design Studio and operating expense. Only comparable comparable periods are used.</div><div class="chart-guide"><b>X-axis:</b> Month / Quarter &nbsp;•&nbsp; <b>Y-axis:</b> Amount<br>Teal = Studio income &nbsp;•&nbsp; Orange = operating expense. Only periods with both values are compared.</div><div class="chart-box" style="height:250px;"><canvas id="chartCost" role="img" aria-label="Studio income versus operating expense chart"></canvas></div><div class="chart-insight" id="costInsight"></div><div class="sc-wrap studio-cost-table-wrap"><table class="studio-table" id="studioCostTable"><tbody><tr><td>Loading periods…</td></tr></tbody></table></div></div>
-<div class="panel" id="studio-combined-production"><div class="panel-head"><span class="panel-title">MONTHLY PIECES COMPLETED &amp; PRODUCTION INCOME</span></div><div class="panel-sub">Pieces completed (left axis) and production income in rupees (right axis) for the same month. Both series respond to the branch and period filters.</div><div class="chart-box" style="height:265px"><canvas id="chartFlow" role="img" aria-label="Monthly pieces completed and production income combined chart"></canvas></div><div class="chart-insight" id="flowInsight"></div></div>
+<div class="panel" id="studio-combined-production"><div class="panel-head"><span class="panel-title">MONTHLY ITEMS MADE &amp; INCOME FROM ITEMS MADE</span></div><div class="panel-sub">Pieces completed (left axis) and production income in rupees (right axis) for the same month. Both series respond to the branch and period filters.</div><div class="chart-box" style="height:265px"><canvas id="chartFlow" role="img" aria-label="Monthly pieces completed and production income combined chart"></canvas></div><div class="chart-insight" id="flowInsight"></div></div>
 </div>
 
 <div class="row row-main">
@@ -1344,10 +1344,10 @@ function renderSummary(){
 
     document.getElementById('summaryText').innerHTML=
       aboutProject+
-      `<div class="summary-line"><span class="summary-tag">RECENT PERFORMANCE</span>${recentText}</div>`+
+      `<div class="summary-line"><span class="summary-tag">RECENT RESULTS</span>${recentText}</div>`+
       `<div class="summary-line"><span class="summary-tag">PRODUCTION OUTPUT</span>${productionText}</div>`+
       `<div class="summary-line"><span class="summary-tag">AFTER DIVA</span>${afterText}</div>`+
-      `<div class="summary-line"><span class="summary-tag">OVERALL IMPACT</span>${impactText}</div>`;
+      `<div class="summary-line"><span class="summary-tag">OVERALL RESULTS</span>${impactText}</div>`;
     return;
   }
 
@@ -1372,10 +1372,10 @@ function renderSummary(){
 
     document.getElementById('summaryText').innerHTML=
       aboutProject+
-      `<div class="summary-line"><span class="summary-tag">RECENT PERFORMANCE</span>${recentText}</div>`+
+      `<div class="summary-line"><span class="summary-tag">RECENT RESULTS</span>${recentText}</div>`+
       `<div class="summary-line"><span class="summary-tag">PRODUCTION OUTPUT</span>${productionText}</div>`+
       `<div class="summary-line"><span class="summary-tag">AFTER DIVA</span>${afterText}</div>`+
-      `<div class="summary-line"><span class="summary-tag">OVERALL IMPACT</span>${impactText}</div>`;
+      `<div class="summary-line"><span class="summary-tag">OVERALL RESULTS</span>${impactText}</div>`;
     return;
   }
 
@@ -1394,7 +1394,7 @@ function renderSummary(){
     `${focus(centerLabel)} · ${focus(periodLabel)}: production income ${value(periodRows.length?compact(periodIncome):'N/A')}`+
     `${periodRows.length?` from ${focus(num(periodCompleted)+' completed pieces')}`:''}.`+
     `</div>`+
-    `<div class="summary-line"><span class="summary-tag">OVERALL IMPACT</span>`+
+    `<div class="summary-line"><span class="summary-tag">OVERALL RESULTS</span>`+
     `${focus(num(s.beneficiary_records)+' unique beneficiaries')} in this Studio scope, with ${focus(num(s.alumni||0)+' alumni')} tracked separately and ${value(compact(s.total))} total beneficiary income so far.`+
     `</div>`;
 }
@@ -1431,7 +1431,7 @@ function renderKPIs(){
   const periodCompleted=available?sum(periodRows,'completed'):null;
   const periodProduction=available?sum(periodRows,'amount'):null;
   const periodParticipants=available?sum(periodRows,'participations'):null;
-  const na='No verified records';
+  const na='No data yet';
   const incomeRows=(DATA.studioIncomeMonthly||[]).filter(r=>selectedBranches().includes(r.branch)&&(state.year==='All'||String(r.year)===state.year)&&(state.month==='All'||String(r.month)===state.month));
   const reportedIncome=incomeRows.length?sum(incomeRows,'income'):null;
   const avgIncomeGroup=state.avgIncomeGroup||'regular';
@@ -1448,17 +1448,17 @@ function renderKPIs(){
   const piecesPerMonthNote=piecesPerMonth===null?'Monthly average unavailable':`Around ${num(piecesPerMonth)} pieces per recorded month across ${num(reportedMonths)} months`;
   const afterValue=(state.branch==='Vastral'&&!DATA.branchSummary.Vastral.after_available)?'N/A':compact(b.after);
   const vals=[
-    ['BENEFICIARIES BY BATCH (COMPLETED + ONGOING)',num(verifiedBatchCount()),'Batch-wise roster totals · not deduplicated between batches'],
+    ['PEOPLE IN STARTED BATCHES',num(verifiedBatchCount()),'Total people in batches. Some may be in more than one batch.'],
 
-    ['TOTAL BENEFICIARY INCOME',compact(b.total),'Earnings during Studio work and income reported after completion'],
-    ['INCOME THROUGH DESIGN STUDIO',reportedIncome===null?na:compact(reportedIncome),'Income earned by beneficiaries while working with the Studio'],
-    ['INCOME AFTER DESIGN STUDIO',afterValue,state.branch==='Vastral'?'After-Studio income not available':state.branch==='All'?'Narol + Naroda after-Studio income':'Income after Design Studio so far'],
-    ['PIECES COMPLETED',available?num(filtered?periodCompleted:b.completed):na,piecesPerMonthNote],
-    ['PRODUCTION INCOME',available?compact(filtered?periodProduction:b.production_amount):na,'Total recorded value of completed Studio production work'],
-    ['INCOME / COMPLETED PIECE',available&&((filtered?periodCompleted:b.completed)>0)?compact((filtered?periodProduction:b.production_amount)/(filtered?periodCompleted:b.completed)):na,'Formula: total production value ÷ completed pieces'],
+    ['TOTAL INCOME EARNED',compact(b.total),'Earnings during Studio work and income reported after completion'],
+    ['INCOME EARNED IN STUDIO',reportedIncome===null?na:compact(reportedIncome),'Income earned by beneficiaries while working with the Studio'],
+    ['INCOME AFTER STUDIO',afterValue,state.branch==='Vastral'?'After-Studio income not available':state.branch==='All'?'Narol + Naroda after-Studio income':'Income after Design Studio so far'],
+    ['ITEMS MADE',available?num(filtered?periodCompleted:b.completed):na,piecesPerMonthNote],
+    ['INCOME FROM ITEMS MADE',available?compact(filtered?periodProduction:b.production_amount):na,'Total recorded value of completed Studio production work'],
+    ['INCOME PER ITEM',available&&((filtered?periodCompleted:b.completed)>0)?compact((filtered?periodProduction:b.production_amount)/(filtered?periodCompleted:b.completed)):na,'Formula: total production value ÷ completed pieces'],
     ['AVG STUDIO INCOME / UNIQUE BENEFICIARY',(avgIncomeDenominator?compact(avgIncomeNumerator/avgIncomeDenominator):na),'']
   ];
-  if(filtered)vals.forEach(v=>{if(['UNIQUE BENEFICIARIES','TOTAL BENEFICIARY INCOME','INCOME AFTER DESIGN STUDIO','AVG STUDIO INCOME / UNIQUE BENEFICIARY'].includes(v[0]))v[2]='Cumulative all-time figure for selected branch; monthly split not verified.'; if(v[1]===na)v[2]='No verified records for this selection; zero earnings are not assumed.';});
+  if(filtered)vals.forEach(v=>{if(['UNIQUE BENEFICIARIES','TOTAL INCOME EARNED','INCOME AFTER STUDIO','AVG STUDIO INCOME / UNIQUE BENEFICIARY'].includes(v[0]))v[2]='Cumulative all-time figure for selected branch; monthly split not verified.'; if(v[1]===na)v[2]='No data yet for this selection; zero earnings are not assumed.';});
   document.getElementById('kpiRow').innerHTML=vals.map(x=>
     `<div class="kpi-card"><div class="kpi-label">${x[0]}</div><div class="kpi-value">${x[1]}</div><div class="kpi-meta">${x[2]}</div></div>`
   ).join('');
@@ -1549,19 +1549,19 @@ function renderFunnel(){
   document.getElementById('funnelCards').innerHTML=`
     <div class="studio-compact-metrics">
       <div class="kpi-card">
-        <div class="kpi-label">PIECES COMPLETED</div>
+        <div class="kpi-label">ITEMS MADE</div>
         <div class="kpi-value">${completed===null?'N/A':num(completed)}</div>
         <div class="kpi-meta">${filtered?'Selected period':'Total completed pieces so far'}</div>
       </div>
       
       <div class="kpi-card">
-        <div class="kpi-label">PRODUCTION INCOME</div>
+        <div class="kpi-label">INCOME FROM ITEMS MADE</div>
         <div class="kpi-value">${income===null?'N/A':compact(income)}</div>
         <div class="kpi-meta">${filtered?'Selected period':'Production income so far'}</div>
       </div>
       
       <div class="kpi-card">
-        <div class="kpi-label">INCOME / COMPLETED PIECE</div>
+        <div class="kpi-label">INCOME PER ITEM</div>
         <div class="kpi-value">${perPiece===null?'N/A':compact(perPiece)}</div>
         <div class="kpi-meta">Production income ÷ completed pieces</div>
       </div>
@@ -1845,8 +1845,8 @@ function renderValueIndicators(){
   const afterShare=trackedBranches.length&&trackedTotal>0?trackedAfter/trackedTotal:null;
 
   const indicators=[
-    ['INCOME / COMPLETED PIECE',completed&&production!==null?compact(production/completed):'N/A','Production income ÷ completed pieces'],
-    ['PRODUCTION INCOME / PARTICIPATION',participations&&production!==null?compact(production/participations):'N/A','Production income ÷ beneficiary participations'],
+    ['INCOME PER ITEM',completed&&production!==null?compact(production/completed):'N/A','Production income ÷ completed pieces'],
+    ['INCOME FROM ITEMS MADE / PARTICIPATION',participations&&production!==null?compact(production/participations):'N/A','Production income ÷ beneficiary participations'],
     ['AFTER-DIVA SHARE OF BENEFICIARY INCOME',afterShare===null?'N/A':pct(afterShare),trackedBranches.length?'Narol + Naroda beneficiary income':'After-DIVA data unavailable']
   ];
 
