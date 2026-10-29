@@ -1449,6 +1449,14 @@ function renderKPIs(){
   const avgIncomeNumerator=avgIncomeGroup==='regular'?avgRegular:avgIncomeGroup==='alumni'?avgAlumni:avgRegular+avgAlumni;
   const avgIncomeDenominator=avgIncomeGroup==='regular'?avgRegularCount:avgIncomeGroup==='alumni'?avgAlumniCount:avgRegularCount+avgAlumniCount;
   const avgIncomeLabel=avgIncomeGroup==='regular'?'Regular beneficiaries':avgIncomeGroup==='alumni'?'Alumni':'Regular and alumni';
+  const evidenceRows=DATA.batches.filter(row=>avgBranches.includes(row.branch)&&(state.batch==='All'||Number(row.batch.match(/\d+/)?.[0])===Number(state.batch))).map(row=>({row,ev:DATA.studioStatusIncomeEvidence?.[row.branch]?.[row.batch]})).filter(({ev})=>ev&&Number.isFinite(ev.regular)&&Number.isFinite(ev.alumni));
+  const evidencedRegularIncome=evidenceRows.reduce((n,{ev})=>n+ev.regular,0);
+  const evidencedAlumniIncome=evidenceRows.reduce((n,{ev})=>n+ev.alumni,0);
+  const evidencedRegularCount=evidenceRows.reduce((n,{row})=>n+Number(row.beneficiary_records||0),0);
+  const evidencedAlumniCount=evidenceRows.reduce((n,{row})=>n+Number(row.alumni||0),0);
+  const evidencedIncome=avgIncomeGroup==='regular'?evidencedRegularIncome:avgIncomeGroup==='alumni'?evidencedAlumniIncome:evidencedRegularIncome+evidencedAlumniIncome;
+  const evidencedCount=avgIncomeGroup==='regular'?evidencedRegularCount:avgIncomeGroup==='alumni'?evidencedAlumniCount:evidencedRegularCount+evidencedAlumniCount;
+  const evidenceNote=evidenceRows.length?'Verified screenshot batches only ('+evidenceRows.map(({row})=>row.branch+' '+row.batch).join(', ')+'); not a full-centre average':'Category income evidence not yet complete for selected batch';
   const reportedMonths=new Set((filtered?periodRows:DATA.monthly.filter(r=>avgBranches.includes(r.branch))).map(r=>r.ym||`${r.year}-${String(r.month).padStart(2,'0')}`)).size;
   const piecesPerMonth=reportedMonths?Math.round((filtered?periodCompleted:b.completed)/reportedMonths):null;
   const piecesPerMonthNote=piecesPerMonth===null?'Monthly average unavailable':`About ${num(piecesPerMonth)} items made each month`;
@@ -1462,7 +1470,7 @@ function renderKPIs(){
     ['ITEMS MADE',available?num(filtered?periodCompleted:b.completed):na,piecesPerMonthNote],
     ['INCOME FROM ITEMS MADE',available?compact(filtered?periodProduction:b.production_amount):na,'Money earned from finished items'],
     ['INCOME PER ITEM',available&&((filtered?periodCompleted:b.completed)>0)?compact((filtered?periodProduction:b.production_amount)/(filtered?periodCompleted:b.completed)):na,'Average money earned per item'],
-    ['AVERAGE STUDIO INCOME PER PERSON',(Object.keys(DATA.studioIncomeByStatus||{}).length&&avgIncomeDenominator?compact(avgIncomeNumerator/avgIncomeDenominator):na),'Status-wise income not verified']
+    ['AVERAGE STUDIO INCOME PER PERSON',evidencedCount?compact(evidencedIncome/evidencedCount):na,evidenceNote]
   ];
   if(filtered)vals.forEach(v=>{if(['UNIQUE BENEFICIARIES','TOTAL INCOME EARNED','INCOME AFTER STUDIO','AVERAGE STUDIO INCOME PER PERSON'].includes(v[0]))v[2]='Total so far for this centre.'; if(v[1]===na)v[2]='No data for this time.';});
   document.getElementById('kpiRow').innerHTML=vals.map(x=>
