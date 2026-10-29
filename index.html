@@ -1427,7 +1427,7 @@ function beneficiaryPeriodCounts(){
 }
 
 const VERIFIED_BATCH_COUNTS={"Narol":[29,21,21,16,16,6],"Naroda":[39,17,14,17,24],"Vastral":[20,20]};
-const verifiedBatchCount=()=> (typeof selectedBranches==='function'?selectedBranches():branchList()).reduce((total,branch)=>total+(VERIFIED_BATCH_COUNTS[branch]||[]).reduce((sum,n)=>sum+n,0),0);
+const verifiedBatchCount=()=>DATA.batches.filter(r=>selectedBranches().includes(r.branch)&&(state.batch==='All'||Number(r.batch.match(/\d+/)?.[0])===Number(state.batch))).reduce((n,r)=>n+Number(r.beneficiary_records||0)+Number(r.alumni||0)+(r.branch==='Vastral'&&r.batch==='BATCH-1'?16:0),0);
 function renderKPIs(){
   const b=scopeSummary();
   const people=beneficiaryPeriodCounts();
@@ -1462,7 +1462,7 @@ function renderKPIs(){
     ['ITEMS MADE',available?num(filtered?periodCompleted:b.completed):na,piecesPerMonthNote],
     ['INCOME FROM ITEMS MADE',available?compact(filtered?periodProduction:b.production_amount):na,'Money earned from finished items'],
     ['INCOME PER ITEM',available&&((filtered?periodCompleted:b.completed)>0)?compact((filtered?periodProduction:b.production_amount)/(filtered?periodCompleted:b.completed)):na,'Average money earned per item'],
-    ['AVERAGE STUDIO INCOME PER PERSON',(avgIncomeDenominator?compact(avgIncomeNumerator/avgIncomeDenominator):na),'']
+    ['AVERAGE STUDIO INCOME PER PERSON',(Object.keys(DATA.studioIncomeByStatus||{}).length&&avgIncomeDenominator?compact(avgIncomeNumerator/avgIncomeDenominator):na),'Status-wise income not verified']
   ];
   if(filtered)vals.forEach(v=>{if(['UNIQUE BENEFICIARIES','TOTAL INCOME EARNED','INCOME AFTER STUDIO','AVERAGE STUDIO INCOME PER PERSON'].includes(v[0]))v[2]='Total so far for this centre.'; if(v[1]===na)v[2]='No data for this time.';});
   document.getElementById('kpiRow').innerHTML=vals.map(x=>
@@ -1876,7 +1876,7 @@ function renderBrackets(){
 function renderBatch(){
   destroy('batch');
   const vals=DATA.batches
-    .filter(r=>selectedBranches().includes(r.branch)&&(state.batch==='All'||Number(r.batch.match(/\\d+/)?.[0])===Number(state.batch))&&Number(r.studio_income||r.total||0)>0)
+    .filter(r=>selectedBranches().includes(r.branch)&&(state.batch==='All'||Number(r.batch.match(/\d+/)?.[0])===Number(state.batch))&&Number(r.studio_income||r.total||0)>0)
     .map(r=>({
       label:(state.branch==='All'?r.branch+' · ':'')+r.batch,
       value:Number(r.studio_income||r.total||0),
@@ -2246,7 +2246,7 @@ function resetStudioQA(){
 function renderRecoveredIncome(){
 const root=document.getElementById('chartRecoveredIncome'),table=document.getElementById('recoveredIncomeTable');if(!root||!table)return;
 const mon=[7,8,9],names=['Jul 2026','Aug 2026','Sep 2026'],branches=selectedBranches();
-const rows=mon.map((month,i)=>({month,label:names[i],v:branches.map(branch=>{const hit=(DATA.studioIncomeMonthly||[]).find(x=>x.branch===branch&&x.month===month&&x.year===2026);return hit?hit.income:null;})}));
+const rows=mon.map((month,i)=>({month,label:names[i],v:branches.map(branch=>{const hit=(DATA.studioIncomeMonthly||[]).find(x=>x.branch===branch&&x.month===month&&x.year===2026&&studioBatchMatches(x));return hit?hit.income:null;})}));
 const active=rows.filter(r=>(state.year==='All'||state.year==='2026')&&(state.month==='All'||Number(state.month)===r.month));
 const money=n=>n===null?'Not reported':'₹'+Number(n).toLocaleString('en-IN',{maximumFractionDigits:2});
 table.innerHTML='<thead><tr><th>Period</th>'+branches.map(b=>'<th>'+b+'</th>').join('')+'<th>Total of reported locations</th></tr></thead><tbody>'+active.map(r=>'<tr><td>'+r.label+'</td>'+r.v.map(v=>'<td>'+money(v)+'</td>').join('')+'<td>'+money(r.v.reduce((a,v)=>a+(v||0),0))+'</td></tr>').join('')+'</tbody>';
@@ -2260,7 +2260,7 @@ function renderAll(){
   safe('summary',renderSummary);safe('kpis',renderKPIs);safe('score',renderScore);safe('funnel',renderFunnel);
   safe('flow',renderFlow);safe('products',renderProducts);safe('matrix',renderMatrix);
   safe('work-sources',renderSources);safe('value-volume',renderValueVolume);safe('cost',renderCost);
-  safe('value-indicators',renderValueIndicators);safe('brackets',renderBrackets);safe('batch',renderBatch);safe('before-after',renderBeforeAfter);
+  safe('value-indicators',renderValueIndicators);safe('reported-income',renderRecoveredIncome);safe('brackets',renderBrackets);safe('batch',renderBatch);safe('before-after',renderBeforeAfter);
 }
 
 document.querySelectorAll('[data-branch]').forEach(btn=>{
