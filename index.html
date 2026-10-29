@@ -1636,8 +1636,11 @@ function normalizeProductName(raw){
   if(map[k])return map[k];
   return s.replace(/\b\w/g,c=>c.toUpperCase());
 }
+const VERIFIED_PRODUCT_MONTHLY=[{"branch":"Narol","product":"Beeds","completed":85,"amount":510,"year":2026,"month":9},{"branch":"Narol","product":"Bag","completed":100,"amount":1000,"year":2026,"month":9},{"branch":"Narol","product":"Kurti","completed":98,"amount":1372,"year":2026,"month":9},{"branch":"Narol","product":"O/L","completed":439,"amount":1756,"year":2026,"month":9},{"branch":"Narol","product":"Duptta","completed":1405,"amount":5620,"year":2026,"month":9},{"branch":"Narol","product":"Pant","completed":105,"amount":1470,"year":2026,"month":9},{"branch":"Narol","product":"Plazo","completed":1615,"amount":17406,"year":2026,"month":9},{"branch":"Narol","product":"Peacock Beeds","completed":700,"amount":4200,"year":2026,"month":9},{"branch":"Naroda","product":"Plazo","completed":2019,"amount":13887,"year":2026,"month":9},{"branch":"Naroda","product":"Beeds Work","completed":73,"amount":438,"year":2026,"month":9},{"branch":"Naroda","product":"Tote Bag","completed":100,"amount":1000,"year":2026,"month":9},{"branch":"Naroda","product":"Kurti O/L","completed":549,"amount":823.5,"year":2026,"month":9},{"branch":"Naroda","product":"Pant","completed":663,"amount":10397,"year":2026,"month":9},{"branch":"Naroda","product":"Kurti","completed":92,"amount":1496,"year":2026,"month":9},{"branch":"Naroda","product":"Duptta","completed":80,"amount":160,"year":2026,"month":9}];
 function productAgg(){
-  const rows=DATA.products.filter(r=>selectedBranches().includes(r.branch));
+  // Historical product aggregates have no month metadata: never misrepresent them as a filtered period.
+  const periodSelected=state.year!=='All'||state.month!=='All'||state.batch!=='All';
+  const rows=periodSelected?VERIFIED_PRODUCT_MONTHLY.filter(r=>selectedBranches().includes(r.branch)&&(state.year==='All'||Number(state.year)===r.year)&&(state.month==='All'||Number(state.month)===r.month)&&studioBatchMatches(r)):DATA.products.filter(r=>selectedBranches().includes(r.branch));
   const m={};
   rows.forEach(r=>{
     const name=normalizeProductName(r.product);
@@ -1659,9 +1662,9 @@ function renderProducts(){
     options:o
   });
   const el=document.getElementById('productsInsight');
-  if(!rows.length){el.textContent='No work-type production data is available for this selection.';return;}
+  if(!rows.length){el.textContent='No verified product-wise records for this selection; historical product totals are not date-tagged.';return;}
   const top=rows[0];
-  el.textContent=`${top.name.trim()||'Top work type'} generates the highest verified production income in this view at ${compact(top.amount)}, from ${num(top.completed)} completed pieces.`;
+  el.textContent=`${top.name.trim()||'Top work type'}: ${compact(top.amount)} beneficiary income from ${num(top.completed)} pieces. ${state.year!=='All'||state.month!=='All'||state.batch!=='All'?'Verified September 2026 product rows only; other periods need source tagging.':'All-time product aggregates; historical month tags unavailable.'}`;
 }
 function renderMatrix(){
   destroy('matrix');
