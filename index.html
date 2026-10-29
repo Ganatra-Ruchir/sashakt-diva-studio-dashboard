@@ -1223,7 +1223,7 @@ body{background:#EDF4FB}
 <div class="row" style="grid-template-columns:1fr;gap:14px;"><div class="panel"><div class="panel-head"><span class="panel-title">DESIGN STUDIO PERFORMANCE OVERVIEW</span></div><div class="panel-sub" style="margin-bottom:12px;">Studio-level overview using unique beneficiaries and production indicators.</div><div class="sc-wrap"><table class="studio-table" id="scoreTable"></table></div></div></div>
 
 <div class="row studio-finance-production-row studio-dual-charts">
- <div class="panel"><div class="panel-head"><span class="panel-title" id="costTitle">MONTHLY STUDIO INCOME VS OPERATING EXPENSE</span><div class="inline-filter"><span class="filter-label">VIEW</span><select id="costGranularity" aria-label="Income and expense chart view"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div><div class="panel-sub" style="margin-bottom:8px;">Two bars per period: income through DIVA Design Studio and operating expense. Only comparable comparable periods are used.</div><div class="chart-guide"><b>X-axis:</b> Month / Quarter &nbsp;•&nbsp; <b>Y-axis:</b> Amount<br>Teal = Studio income &nbsp;•&nbsp; Orange = operating expense. Only periods with both values are compared.</div><div class="chart-box" style="height:250px;"><canvas id="chartCost" role="img" aria-label="Studio income versus operating expense chart"></canvas></div><div class="chart-insight" id="costInsight"></div><div class="sc-wrap studio-cost-table-wrap"><table class="studio-table" id="studioCostTable"><tbody><tr><td>Loading periods…</td></tr></tbody></table></div></div>
+ <div class="panel"><div class="panel-head"><span class="panel-title" id="costTitle">STUDIO-GENERATED BENEFICIARY INCOME VS OPERATING EXPENSE</span><div class="inline-filter"><span class="filter-label">VIEW</span><select id="costGranularity" aria-label="Income and expense chart view"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div><div class="panel-sub" style="margin-bottom:8px;">Two bars per period: beneficiary income generated through DIVA Design Studio and centre operating expense. Only comparable periods are used.</div><div class="chart-guide"><b>X-axis:</b> Month / Quarter &nbsp;•&nbsp; <b>Y-axis:</b> Amount<br>Teal = beneficiary income generated through Studio &nbsp;•&nbsp; Orange = operating expense. Only periods with both values are compared.</div><div class="chart-box" style="height:250px;"><canvas id="chartCost" role="img" aria-label="Studio income versus operating expense chart"></canvas></div><div class="chart-insight" id="costInsight"></div><div class="sc-wrap studio-cost-table-wrap"><table class="studio-table" id="studioCostTable"><tbody><tr><td>Loading periods…</td></tr></tbody></table></div></div>
 <div class="panel" id="studio-combined-production"><div class="panel-head"><span class="panel-title">MONTHLY ITEMS MADE &amp; INCOME FROM ITEMS MADE</span></div><div class="panel-sub">Pieces completed (left axis) and beneficiary income in rupees (right axis) for the same month. Both series respond to the branch and period filters.</div><div class="chart-box" style="height:265px"><canvas id="chartFlow" role="img" aria-label="Monthly pieces completed and beneficiary income combined chart"></canvas></div><div class="chart-insight" id="flowInsight"></div></div>
 </div>
 
@@ -1810,7 +1810,7 @@ function renderCost(){
       '<tr><th>Total shown</th><th>'+fmt(vals.reduce((a,r)=>a+r.income,0))+'</th><th>'+fmt(vals.reduce((a,r)=>a+r.expense,0))+'</th><th>'+fmt(vals.reduce((a,r)=>a+r.income-r.expense,0))+'</th></tr></tbody>';
   }
   const title=document.getElementById('costTitle');
-  if(title)title.textContent=isQuarterly?'QUARTERLY STUDIO INCOME VS OPERATING EXPENSE':'MONTHLY STUDIO INCOME VS OPERATING EXPENSE';
+  if(title)title.textContent=isQuarterly?'QUARTERLY STUDIO INCOME VS OPERATING EXPENSE':'STUDIO-GENERATED BENEFICIARY INCOME VS OPERATING EXPENSE';
 
   const canvas=document.getElementById('chartCost');
   const insight=document.getElementById('costInsight');
@@ -1837,7 +1837,7 @@ function renderCost(){
     data:{
       labels:vals.map(x=>x.label),
       datasets:[
-        {label:isQuarterly?'Quarterly Studio Income':'Monthly Studio Income',data:vals.map(x=>x.income),backgroundColor:'rgba(4,180,150,.78)',borderRadius:4},
+        {label:isQuarterly?'Quarterly Studio-Generated Income':'Monthly Studio-Generated Income',data:vals.map(x=>x.income),backgroundColor:'rgba(4,180,150,.78)',borderRadius:4},
         {label:isQuarterly?'Quarterly Operating Expense':'Monthly Operating Expense',data:vals.map(x=>x.expense),backgroundColor:'rgba(242,104,37,.78)',borderRadius:4}
       ]
     },
