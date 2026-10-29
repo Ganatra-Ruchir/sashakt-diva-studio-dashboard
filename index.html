@@ -1640,7 +1640,7 @@ const VERIFIED_PRODUCT_MONTHLY=[{"branch":"Narol","product":"Beeds","completed":
 function productAgg(){
   // Historical product aggregates have no month metadata: never misrepresent them as a filtered period.
   const periodSelected=state.year!=='All'||state.month!=='All'||state.batch!=='All';
-  const rows=periodSelected?VERIFIED_PRODUCT_MONTHLY.filter(r=>selectedBranches().includes(r.branch)&&(state.year==='All'||Number(state.year)===r.year)&&(state.month==='All'||Number(state.month)===r.month)&&studioBatchMatches(r)):DATA.products.filter(r=>selectedBranches().includes(r.branch));
+  const rows=periodSelected?VERIFIED_PRODUCT_MONTHLY.filter(r=>selectedBranches().includes(r.branch)&&(state.year==='All'||Number(state.year)===r.year)&&(state.month==='All'||Number(state.month)===r.month)&&studioBatchMatches(r)):[...DATA.products.filter(r=>selectedBranches().includes(r.branch)),...VERIFIED_PRODUCT_MONTHLY.filter(r=>selectedBranches().includes(r.branch))];
   const m={};
   rows.forEach(r=>{
     const name=normalizeProductName(r.product);
@@ -1730,7 +1730,7 @@ function renderSources(){
   o.scales.x.ticks.callback=v=>num(v);
   o.plugins.tooltip.callbacks.label=c=>{
     const r=rows[c.dataIndex];
-    return ['Completed pieces: '+num(r.completed),'Recorded production income: '+compact(r.amount)];
+    return ['Completed pieces: '+num(r.completed),'Beneficiary income: '+compact(r.amount)];
   };
   charts.sources=new Chart(document.getElementById('chartSources'),{
     type:'bar',
