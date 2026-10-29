@@ -1454,9 +1454,10 @@ function renderKPIs(){
   const evidencedAlumniIncome=evidenceRows.reduce((n,{ev})=>n+ev.alumni,0);
   const evidencedRegularCount=evidenceRows.reduce((n,{row})=>n+Number(row.beneficiary_records||0),0);
   const evidencedAlumniCount=evidenceRows.reduce((n,{row})=>n+Number(row.alumni||0),0);
-  const evidencedIncome=avgIncomeGroup==='regular'?evidencedRegularIncome:avgIncomeGroup==='alumni'?evidencedAlumniIncome:evidencedRegularIncome+evidencedAlumniIncome;
-  const evidencedCount=avgIncomeGroup==='regular'?evidencedRegularCount:avgIncomeGroup==='alumni'?evidencedAlumniCount:evidencedRegularCount+evidencedAlumniCount;
-  const evidenceNote=evidenceRows.length?'Verified screenshot batches only ('+evidenceRows.map(({row})=>row.branch+' '+row.batch).join(', ')+'); not a full-centre average':'Category income evidence not yet complete for selected batch';
+  const ojtRows=DATA.batches.filter(row=>row.branch==='Vastral'&&row.batch==='BATCH-1'&&avgBranches.includes('Vastral')&&(state.batch==='All'||state.batch==='1'));const ojtIncome=ojtRows.length?Number(DATA.studioStatusIncomeEvidence?.Vastral?.['BATCH-1']?.ojt||0):0;const ojtCount=ojtRows.length?16:0;
+  const evidencedIncome=avgIncomeGroup==='ojt'?ojtIncome:avgIncomeGroup==='regular'?evidencedRegularIncome:avgIncomeGroup==='alumni'?evidencedAlumniIncome:evidencedRegularIncome+evidencedAlumniIncome+ojtIncome;
+  const evidencedCount=avgIncomeGroup==='ojt'?ojtCount:avgIncomeGroup==='regular'?evidencedRegularCount:avgIncomeGroup==='alumni'?evidencedAlumniCount:evidencedRegularCount+evidencedAlumniCount+ojtCount;
+  const evidenceNote=avgIncomeGroup==='ojt'?'Vastral Batch 1 · 16 OJT students · ₹13,955 reported income':evidenceRows.length?'Verified screenshot batches only ('+evidenceRows.map(({row})=>row.branch+' '+row.batch).join(', ')+'); not a full-centre average':'Category income evidence not yet complete for selected batch';
   const reportedMonths=new Set((filtered?periodRows:DATA.monthly.filter(r=>avgBranches.includes(r.branch))).map(r=>r.ym||`${r.year}-${String(r.month).padStart(2,'0')}`)).size;
   const piecesPerMonth=reportedMonths?Math.round((filtered?periodCompleted:b.completed)/reportedMonths):null;
   const piecesPerMonthNote=piecesPerMonth===null?'Monthly average unavailable':`About ${num(piecesPerMonth)} items made each month`;
@@ -1481,7 +1482,7 @@ function renderKPIs(){
     const label=card.querySelector('.kpi-label');
     if(label)label.textContent='AVERAGE STUDIO INCOME PER PERSON';
     const select=document.createElement('select');select.className='studio-avg-selector';select.setAttribute('aria-label','Average income beneficiary group');
-    [['regular','Regular beneficiaries'],['alumni','Alumni'],['overall','Overall']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;select.appendChild(o);});
+    [['regular','Regular beneficiaries'],['alumni','Alumni'],['overall','Overall'],['ojt','OJT']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;select.appendChild(o);});
     select.value=state.avgIncomeGroup||'regular';
     select.addEventListener('change',e=>{state.avgIncomeGroup=e.target.value;renderKPIs();});
     card.querySelector('.kpi-value').after(select);
