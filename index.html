@@ -1456,9 +1456,8 @@ function renderKPIs(){
   const vals=[
     ['BENEFICIARIES',num(verifiedBatchCount()),(()=>{const rows=DATA.batches.filter(r=>selectedBranches().includes(r.branch)&&(state.batch==='All'||Number(r.batch.match(/\d+/)?.[0])===Number(state.batch)));const regular=rows.reduce((n,r)=>n+Number(r.beneficiary_records||0),0);const alumni=rows.reduce((n,r)=>n+Number(r.alumni||0),0);const ojt=rows.some(r=>r.branch==='Vastral'&&r.batch==='BATCH-1')?16:0;return `${num(regular)} regular · ${num(alumni)} alumni${ojt?' · '+num(ojt)+' OJT':''}`;})()],
 
-    ['TOTAL INCOME EARNED',compact(b.total),'Income earned in the Studio and after leaving'],
-    ['INCOME EARNED IN STUDIO',reportedIncome===null?na:compact(reportedIncome),'Money earned by people working in the Studio'],
-    ['DIWALI BOX INCOME',(()=>{const rows=DATA.diwaliBoxIncome.filter(r=>selectedBranches().includes(r.branch)&&(state.year==='All'||String(r.year)===state.year)&&(state.month==='All'||String(r.month)===state.month));return rows.length?compact(sum(rows,'total')):'N/A';})(),'Narol · September 2026 · Regular ₹7,700 + Alumni ₹26,400 · separate breakdown; not double-counted'],
+    ['TOTAL INCOME EARNED',compact(b.total),(state.batch==='6'&&selectedBranches().includes('Narol')&&(state.year==='All'||state.year==='2026')&&(state.month==='All'||state.month==='9'))?'Includes ₹34,100 Diwali Box income (Narol · Sep 2026); reconciliation with Studio total pending':'Income earned in the Studio and after leaving'],
+    ['INCOME EARNED IN STUDIO',reportedIncome===null?na:compact(reportedIncome),'Money earned by people working in the Studio']
     ['INCOME AFTER STUDIO',afterValue,state.branch==='Vastral'?'No data after leaving Studio':state.branch==='All'?'Narol + Naroda after-Studio income':'Income earned after leaving Studio'],
     ['ITEMS MADE',available?num(filtered?periodCompleted:b.completed):na,piecesPerMonthNote],
     ['INCOME FROM ITEMS MADE',available?compact(filtered?periodProduction:b.production_amount):na,'Money earned from finished items'],
