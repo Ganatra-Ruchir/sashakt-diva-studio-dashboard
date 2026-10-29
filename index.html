@@ -1640,7 +1640,7 @@ const VERIFIED_PRODUCT_MONTHLY=[{"branch":"Narol","product":"Beeds","completed":
 function productAgg(){
   // Historical product aggregates have no month metadata: never misrepresent them as a filtered period.
   const periodSelected=state.year!=='All'||state.month!=='All'||state.batch!=='All';
-  const rows=periodSelected?VERIFIED_PRODUCT_MONTHLY.filter(r=>selectedBranches().includes(r.branch)&&(state.year==='All'||Number(state.year)===r.year)&&(state.month==='All'||Number(state.month)===r.month)&&studioBatchMatches(r)):[...DATA.products.filter(r=>selectedBranches().includes(r.branch)),...VERIFIED_PRODUCT_MONTHLY.filter(r=>selectedBranches().includes(r.branch))];
+  const rows=periodSelected?VERIFIED_PRODUCT_MONTHLY.filter(r=>selectedBranches().includes(r.branch)&&(state.year==='All'||Number(state.year)===r.year)&&(state.month==='All'||Number(state.month)===r.month)&&studioBatchMatches(r)):DATA.products.filter(r=>selectedBranches().includes(r.branch));
   const m={};
   rows.forEach(r=>{
     const name=normalizeProductName(r.product);
@@ -1664,7 +1664,7 @@ function renderProducts(){
   const el=document.getElementById('productsInsight');
   if(!rows.length){el.textContent='No verified product-wise records for this selection; historical product totals are not date-tagged.';return;}
   const top=rows[0];
-  el.textContent=`${top.name.trim()||'Top work type'}: ${compact(top.amount)} beneficiary income from ${num(top.completed)} pieces. ${state.year!=='All'||state.month!=='All'||state.batch!=='All'?'Verified September 2026 product rows only; other periods need source tagging.':'All-time product aggregates; historical month tags unavailable.'}`;
+  el.textContent=`${top.name.trim()||'Top work type'}: ${compact(top.amount)} beneficiary income from ${num(top.completed)} pieces. ${state.year!=='All'||state.month!=='All'||state.batch!=='All'?'Verified September 2026 product rows only; other periods need source tagging.':'Historical product aggregates are displayed without adding September again; full tracker reconciliation pending.'}`;
 }
 function renderMatrix(){
   destroy('matrix');
