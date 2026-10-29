@@ -1470,7 +1470,6 @@ function renderKPIs(){
     ['INCOME EARNED IN STUDIO',reportedIncome===null?na:compact(reportedIncome),'Money earned by people working in the Studio'],
     ['INCOME AFTER STUDIO',afterValue,state.branch==='Vastral'?'No data after leaving Studio':state.branch==='All'?'Narol + Naroda after-Studio income':'Income earned after leaving Studio'],
     ['ITEMS MADE',available?num(filtered?periodCompleted:b.completed):na,piecesPerMonthNote],
-    ['INCOME FROM ITEMS MADE',available?compact(filtered?periodProduction:b.production_amount):na,'Money earned from finished items'],
     ['INCOME PER ITEM',available&&((filtered?periodCompleted:b.completed)>0)?compact((filtered?periodProduction:b.production_amount)/(filtered?periodCompleted:b.completed)):na,'Average money earned per item'],
     ['AVERAGE STUDIO INCOME PER PERSON',evidencedCount?compact(evidencedIncome/evidencedCount):na,evidenceNote]
   ];
@@ -1614,7 +1613,8 @@ function renderProdIncome(){
   el.textContent=`${peak.label} has the highest production income in this view at ${compact(peak.amount)}. Total production income in the selected period: ${compact(sum(vals,'amount'))}.`;
 }
 function normalizeProductName(raw){
-  const s=String(raw||'Unspecified').trim().replace(/\s+/g,' ');
+  const s=String(raw||'Product Not Specified').trim().replace(/\s+/g,' ');
+  if(!s || /^(undefined|unknown|unspecified|n\/?a|null|not available)$/i.test(s)) return 'Product Not Specified';
   const k=s.toLowerCase().replace(/\s*-\s*/g,'-').trim();
   const map={
     'plzao':'Plazo','plzo':'Plazo','plazzo':'Plazo',
