@@ -1454,7 +1454,7 @@ function renderKPIs(){
   const piecesPerMonthNote=piecesPerMonth===null?'Monthly average unavailable':`About ${num(piecesPerMonth)} items made each month`;
   const afterValue=(state.branch==='Vastral'&&!DATA.branchSummary.Vastral.after_available)?'N/A':compact(b.after);
   const vals=[
-    ['BENEFICIARIES',num(verifiedBatchCount()),''],
+    ['BENEFICIARIES',num(verifiedBatchCount()),(()=>{const rows=DATA.batches.filter(r=>selectedBranches().includes(r.branch)&&(state.batch==='All'||Number(r.batch.match(/\d+/)?.[0])===Number(state.batch)));const regular=rows.reduce((n,r)=>n+Number(r.beneficiary_records||0),0);const alumni=rows.reduce((n,r)=>n+Number(r.alumni||0),0);const ojt=rows.some(r=>r.branch==='Vastral'&&r.batch==='BATCH-1')?16:0;return `${num(regular)} regular · ${num(alumni)} alumni${ojt?' · '+num(ojt)+' OJT':''}`;})()],
 
     ['TOTAL INCOME EARNED',compact(b.total),'Income earned in the Studio and after leaving'],
     ['INCOME EARNED IN STUDIO',reportedIncome===null?na:compact(reportedIncome),'Money earned by people working in the Studio'],
