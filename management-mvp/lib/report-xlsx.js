@@ -2,11 +2,12 @@ const ExcelJS=require('exceljs');
 const clean=v=>String(v??'').replace(/[\\/*?:\[\]]/g,' ').slice(0,31);
 const monthList=(start,end)=>{const a=new Date(start.slice(0,7)+'-01T00:00:00Z'),b=new Date(end.slice(0,7)+'-01T00:00:00Z'),out=[];while(a<=b){out.push(a.toISOString().slice(0,10));a.setUTCMonth(a.getUTCMonth()+1)}return out};
 module.exports=async function(report){
+ const details=report.details,format=report.format||'all',include=k=>format==='all'||format===k;
  const wb=new ExcelJS.Workbook();wb.creator='Diva Studio';const months=monthList(report.start,report.end);
  const monthName=m=>new Date(m+'T00:00:00Z').toLocaleString('en-IN',{month:'short',year:'numeric',timeZone:'UTC'});
  const header=row=>{row.eachCell({includeEmpty:true},c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF245544'}};c.alignment={vertical:'middle',wrapText:true}})};
- const info=wb.addWorksheet('Read me');info.columns=[{width:30},{width:110}];info.addRows([['DIVA DATA','Batch-wise income export'],['Selected dates',report.start+' to '+report.end],['Live records','Manager allocations within exact selected dates.'],['Historical records','Latest legacy workbook, whole months intersecting selected dates; kept separate to prevent double counting.'],['Flagged historical rows','Rows with discrepancies or missing totals are exported separately.'],['Verified income','Independent reconciliation is on a separate sheet; it is never added to manager income.'],['Blank vs zero','Blank = no recorded amount; numeric zero = recorded zero.']]);header(info.getRow(1));
- const sources=[['Live',report.live],['Legacy matched',report.legacy.filter(r=>r.source_status==='matched')],['Legacy flagged',report.legacy.filter(r=>r.source_status!=='matched')]];
+ const info=wb.addWorksheet('Read me');info.columns=[{width:30},{width:110}];info.addRows([['DIVA DATA','Batch-wise income export'],['Selected dates',report.start+' to '+report.end],['Live records','Only matched or owner-approved earnings are in Diva Data. Production and self-reports remain separate.'],['Beneficiary filter',report.beneficiary||'All'],['Batch filter',report.batch||'All (demo excluded by default)'],['Batch attribution','Production uses saved batch; self-income and payments use current batch unless same-day production identifies one batch. Multi-batch verification is separately flagged when filtering.'],['Adjustments','An approved daily amount that differs from production is not assigned to a specific product or vendor.'],['Payment records','Cash paid within selected dates, not an outstanding balance.'],['Assignment records','Receipt-date filter; completion status as of export. Pieces received repeat for each assignment in the same order: do not sum this column.'],['Historical records','Latest legacy workbook, whole months intersecting selected dates; kept separate to prevent double counting.'],['Flagged historical rows','Rows with discrepancies or missing totals are exported separately.'],['Verified income','Matched or approved earnings only; unresolved entries are not part of official totals.'],['Blank vs zero','Blank = no recorded amount; numeric zero = recorded zero.']]);header(info.getRow(1));
+ const sources=include('diva')?[['Live verified',details.official],['Legacy matched',report.legacy.filter(r=>r.source_status==='matched')],['Legacy flagged',report.legacy.filter(r=>r.source_status!=='matched')]]:[];
  for(const [source,all] of sources){
  for(const studio of [...new Set(all.map(r=>r.studio))]){
  const ws=wb.addWorksheet(clean(source+' '+studio));ws.views=[{state:'frozen',xSplit:2,ySplit:1}];ws.getColumn(1).width=12;ws.getColumn(2).width=34;
@@ -26,7 +27,23 @@ module.exports=async function(report){
  const last=ws.rowCount;const total=ws.addRow(['','TOTAL']);for(let col=3;col<=summaryTotal;col++){if(col===leftTotal+1||col===summaryStart||col===summaryStart+1)continue;const letter=ws.getColumn(col).letter;total.getCell(col).value={formula:'SUM('+letter+first+':'+letter+last+')'};total.getCell(col).numFmt='#,##0.00'}total.font={bold:true};for(let col=3;col<=summaryTotal;col++)ws.getColumn(col).width=Math.max(ws.getColumn(col).width||0,col===summaryStart+1?34:17);ws.addRow([]);
  }
  }}
- const verification=wb.addWorksheet('Income verification');verification.addRow(['Studio','Month','Verified income','Differences','Pending']);header(verification.getRow(1));for(const r of report.verification)verification.addRow([r.studio,r.month,r.verified_income==null?null:Number(r.verified_income),Number(r.differences),Number(r.pending)]);verification.columns.forEach(c=>c.width=22);
- const att=wb.addWorksheet('Attendance');att.addRow(['Studio','Marked','Present','Home-based']);header(att.getRow(1));for(const r of report.attendance)att.addRow([r.studio,Number(r.marked),Number(r.present),Number(r.home_based)]);att.columns.forEach(c=>c.width=22);
+ const fields=(cols)=>cols.map(x=>Array.isArray(x)?x:[x,x]);
+ const sheet=(name,rows,cols)=>{const ws=wb.addWorksheet(name),fs=fields(cols);ws.addRow(fs.map(c=>c[1]));header(ws.getRow(1));ws.views=[{state:'frozen',ySplit:1}];ws.autoFilter={from:{row:1,column:1},to:{row:1,column:fs.length}};
+ for(const r of rows){const row=ws.addRow(fs.map(([key,label,n])=>r[key]==null?null:n?Number(r[key]):String(r[key])));fs.forEach((c,i)=>{if(c[2])row.getCell(i+1).numFmt='#,##0.00'})}fs.forEach((c,i)=>ws.getColumn(i+1).width=Math.min(48,Math.max(16,c[1].length+4)));};
+ const who=[['studio','Studio'],['batch','Batch'],['beneficiary_key','Beneficiary code'],['beneficiary','Beneficiary']];
+ const day=['work_date','Work date'];
+ const ver=[...who,day,['manager_income','Production earnings',true],['beneficiary_income','Declared Diva earnings',true],['difference','Difference',true],['status','Status'],['original_status','Original status'],['verified_income','Verified earnings',true],['reason','Approval reason'],['approved_at','Approved at']];
+ if(include('production')){
+ sheet('Production income',details.production,[...who,day,['vendor','Vendor'],['product','Product'],['production_id','Production ID'],['pieces','Completed pieces',true],['rate','Beneficiary rate',true],['income','Earned income',true]]);
+ sheet('Work assignments',details.assignments,[...who,['received_date','Received date'],['vendor','Vendor'],['product','Product'],['order_id','Order ID'],['pieces_received','Order pieces (repeated)',true],['vendor_rate','Vendor rate',true],['assignment_id','Assignment ID'],['pieces','Assigned pieces',true],['rate','Beneficiary rate',true],['expected_income','Expected earnings',true],['completed_date','Completed date'],['status','Status']]);
+ }
+ if(include('beneficiary'))sheet('Beneficiary daily income',details.self,[...who,day,['income','Declared Diva earnings',true],['outside_income','Outside earnings',true],['submitted_at','Submitted at']]);
+ if(include('verification'))sheet('Income verification',details.verification,ver);
+ if(include('diva')){
+ sheet('Unresolved income',details.verification.filter(r=>r.verified_income==null),ver);
+ sheet('Reconciled adjustments',details.unallocated,ver);
+ if(details.ambiguous.length)sheet('Multi-batch review',details.ambiguous,ver);
+ }
+ if(include('payments'))sheet('Payments',details.payments,[...who,['payment_date','Payment date'],['amount','Paid amount',true],['reference','Reference']]);
  return Buffer.from(await wb.xlsx.writeBuffer()).toString('base64');
 };
