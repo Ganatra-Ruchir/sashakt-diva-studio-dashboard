@@ -10,7 +10,7 @@ const field=(n,l,type='text',val='')=>'<label>'+esc(l)+'</label><input name="'+n
 const select=(n,l,o)=>'<label>'+esc(l)+'</label><select name="'+n+'" required><option value="">Select</option>'+o+'</select>';
 const studio=()=>['owner','admin'].includes(user.role)?select('studio_id','Studio',opts(data.studios.filter(x=>x.active))):'';
 const card=(title,html)=>'<section class="card"><h2>'+title+'</h2>'+html+'</section>';
-const form=(action,html)=>'<form data-action="'+action+'">'+html+'<button>Save</button></form>';
+const form=(action,html)=>'<form data-action="'+action+'">'+html+'<button>'+(action==='login'?'Sign in':'Save')+'</button></form>';
 const table=(arr,cols)=>'<div class="scroll"><table><thead><tr>'+cols.map(x=>'<th>'+esc(x[1])+'</th>').join('')+'</tr></thead><tbody>'+arr.map(r=>'<tr>'+cols.map(x=>'<td>'+esc(r[x[0]])+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
 async function api(action,b={}){const r=await fetch('/api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...b})});const d=await r.json();if(!r.ok)throw Error(d.error||'Request failed');return d;}
 function showLogin(){user=null;logout.hidden=true;root.innerHTML='<section class="card login"><h1>Welcome to Diva</h1><p class="muted">Sign in with your assigned account.</p>'+form('login',field('username','Username')+field('password','Password','password'))+'<p class="muted">Owner · Admin · Studio manager · Beneficiary</p></section>';}
